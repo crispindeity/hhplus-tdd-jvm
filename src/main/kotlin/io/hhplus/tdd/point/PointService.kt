@@ -11,7 +11,9 @@ import io.hhplus.tdd.point.port.output.UserPointCommandPort
 import io.hhplus.tdd.point.port.output.UserPointQueryPort
 import io.hhplus.tdd.util.Log
 import org.slf4j.Logger
+import org.springframework.stereotype.Service
 
+@Service
 class PointService(
     private val userPointQueryPort: UserPointQueryPort,
     private val pointHistoryQueryPort: PointHistoryQueryPort,
