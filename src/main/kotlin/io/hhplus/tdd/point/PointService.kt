@@ -87,4 +87,31 @@ class PointService(
                 updateMillis = chargedUserPoint.updateMillis
             )
         }
+
+    override fun useUserPoint(
+        id: Long,
+        amount: Long
+    ) = Log.logging(logger) { log ->
+        log["method"] = "useUserPoint()"
+
+        val foundUserPoint: UserPoint =
+            userPointQueryPort.findBy(id) ?: throw CustomException(
+                codeInterface = ErrorCode.NOT_FOUND_USER_POINT,
+                additionalMessage = id.toString()
+            )
+
+        val usedUserPoint: UserPoint = foundUserPoint.pointUse(amount)
+
+        val updatedUserPoint: UserPoint =
+            userPointCommandPort.useUserPoint(
+                id = usedUserPoint.id,
+                amount = usedUserPoint.point
+            )
+
+        return@logging UserPointCommandUseCase.UseUserPointResponse(
+            id = updatedUserPoint.id,
+            point = updatedUserPoint.point,
+            updateMillis = updatedUserPoint.updateMillis
+        )
+    }
 }
