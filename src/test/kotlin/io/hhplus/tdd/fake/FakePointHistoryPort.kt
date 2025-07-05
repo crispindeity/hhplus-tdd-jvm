@@ -4,7 +4,7 @@ import io.hhplus.tdd.point.PointHistory
 import io.hhplus.tdd.point.TransactionType
 import io.hhplus.tdd.point.port.output.PointHistoryQueryPort
 
-class FakePointHistoryQueryPort : PointHistoryQueryPort {
+class FakePointHistoryPort : PointHistoryQueryPort {
     private val storage: MutableMap<Long, PointHistory> = mutableMapOf()
 
     fun singlePointHistoryFixture(

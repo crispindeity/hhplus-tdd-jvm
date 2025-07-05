@@ -4,17 +4,21 @@ import io.hhplus.tdd.exception.CustomException
 import io.hhplus.tdd.exception.ErrorCode
 import io.hhplus.tdd.point.extensions.toDto
 import io.hhplus.tdd.point.port.input.PointHistoryQueryUseCase
+import io.hhplus.tdd.point.port.input.UserPointCommandUseCase
 import io.hhplus.tdd.point.port.input.UserPointQueryUseCase
 import io.hhplus.tdd.point.port.output.PointHistoryQueryPort
+import io.hhplus.tdd.point.port.output.UserPointCommandPort
 import io.hhplus.tdd.point.port.output.UserPointQueryPort
 import io.hhplus.tdd.util.Log
 import org.slf4j.Logger
 
 class PointService(
     private val userPointQueryPort: UserPointQueryPort,
-    private val pointHistoryQueryPort: PointHistoryQueryPort
+    private val pointHistoryQueryPort: PointHistoryQueryPort,
+    private val userPointCommandPort: UserPointCommandPort
 ) : UserPointQueryUseCase,
-    PointHistoryQueryUseCase {
+    PointHistoryQueryUseCase,
+    UserPointCommandUseCase {
     private val logger: Logger = Log.getLogger(PointService::class.java)
 
     override fun retrieveUserPoint(id: Long): UserPointQueryUseCase.UserPointResponse =
@@ -52,6 +56,35 @@ class PointService(
             return@logging PointHistoryQueryUseCase.PointHistoryResponses(
                 responses = pointHistories.map { it.toDto() },
                 count = pointHistories.size
+            )
+        }
+
+    override fun chargeUserPoint(
+        id: Long,
+        amount: Long
+    ): UserPointCommandUseCase.ChargeUserPointResponse =
+        Log.logging(logger) { log ->
+            log["method"] = "chargeUserPoint()"
+            val userPoint: UserPoint =
+                userPointQueryPort
+                    .findBy(id)
+                    ?.pointCharge(amount)
+                    ?: UserPoint(
+                        id = id,
+                        point = amount,
+                        updateMillis = System.currentTimeMillis()
+                    )
+
+            val chargedUserPoint: UserPoint =
+                userPointCommandPort.chargeUserPoint(
+                    id = userPoint.id,
+                    amount = userPoint.point
+                )
+
+            UserPointCommandUseCase.ChargeUserPointResponse(
+                id = chargedUserPoint.id,
+                point = chargedUserPoint.point,
+                updateMillis = chargedUserPoint.updateMillis
             )
         }
 }

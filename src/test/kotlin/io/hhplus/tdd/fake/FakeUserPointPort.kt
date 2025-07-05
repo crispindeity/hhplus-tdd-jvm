@@ -1,9 +1,12 @@
 package io.hhplus.tdd.fake
 
 import io.hhplus.tdd.point.UserPoint
+import io.hhplus.tdd.point.port.output.UserPointCommandPort
 import io.hhplus.tdd.point.port.output.UserPointQueryPort
 
-class FakeUserPointQueryPort : UserPointQueryPort {
+class FakeUserPointPort :
+    UserPointQueryPort,
+    UserPointCommandPort {
     private val storage: MutableMap<Long, UserPoint> = mutableMapOf()
 
     fun singleUserPointFixture(
@@ -21,4 +24,18 @@ class FakeUserPointQueryPort : UserPointQueryPort {
     }
 
     override fun findBy(id: Long): UserPoint? = storage[id]
+
+    override fun chargeUserPoint(
+        id: Long,
+        amount: Long
+    ): UserPoint {
+        val userPoint =
+            UserPoint(
+                id = id,
+                point = amount,
+                updateMillis = System.currentTimeMillis()
+            )
+        storage[id] = userPoint
+        return userPoint
+    }
 }
