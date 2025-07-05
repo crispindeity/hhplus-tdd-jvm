@@ -26,6 +26,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.validation)
     annotationProcessor(libs.spring.boot.configuration.processor)
     testImplementation(libs.spring.boot.starter.test)
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
