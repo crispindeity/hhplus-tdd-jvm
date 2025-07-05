@@ -19,4 +19,11 @@ class UserPointPersistenceAdapter :
     ): UserPoint {
         TODO("Not yet implemented")
     }
+
+    override fun useUserPoint(
+        id: Long,
+        amount: Long
+    ): UserPoint {
+        TODO("Not yet implemented")
+    }
 }

@@ -24,6 +24,14 @@ data class UserPoint(
         )
     }
 
+    fun pointUse(amount: Long): UserPoint {
+        verifySufficientPoint(amount)
+        return this.copy(
+            point = point - amount,
+            updateMillis = System.currentTimeMillis()
+        )
+    }
+
     private fun verifyMaxPointLimit(amount: Long) {
         if (this.point + amount < USER_POINT_LIMIT) {
             return
@@ -31,6 +39,16 @@ data class UserPoint(
         throw CustomException(
             codeInterface = ErrorCode.EXCEEDS_MAX_POINT_LIMIT,
             additionalMessage = amount.toString()
+        )
+    }
+
+    private fun verifySufficientPoint(amount: Long) {
+        if (this.point - amount >= 0) {
+            return
+        }
+        throw CustomException(
+            codeInterface = ErrorCode.INSUFFICIENT_POINT,
+            additionalMessage = "requestPoint: $amount, currentPoint: ${this.point}"
         )
     }
 }

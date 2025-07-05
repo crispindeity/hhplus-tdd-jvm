@@ -38,4 +38,18 @@ class FakeUserPointPort :
         storage[id] = userPoint
         return userPoint
     }
+
+    override fun useUserPoint(
+        id: Long,
+        amount: Long
+    ): UserPoint {
+        val userPoint =
+            UserPoint(
+                id = id,
+                point = amount,
+                updateMillis = System.currentTimeMillis()
+            )
+        storage[id] = userPoint
+        return userPoint
+    }
 }

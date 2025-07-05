@@ -7,4 +7,9 @@ interface UserPointCommandPort {
         id: Long,
         amount: Long
     ): UserPoint
+
+    fun useUserPoint(
+        id: Long,
+        amount: Long
+    ): UserPoint
 }

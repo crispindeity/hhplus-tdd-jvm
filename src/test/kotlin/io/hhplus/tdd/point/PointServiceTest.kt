@@ -230,4 +230,67 @@ class PointServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("유저 포인트 사용 테스트")
+    inner class UseUserPointTest {
+        @Nested
+        @DisplayName("유저 포인트 사용 성공 테스트")
+        inner class UseUserPointSuccessTest {
+            @Test
+            @DisplayName("유저는 보유한 포인트를 사용할 수 있어야 한다.")
+            fun useUserPointTest() {
+                // given
+                val userId = 1L
+                val amount = 1000L
+
+                fakeUserPointPort.singleUserPointFixture(
+                    id = userId,
+                    point = amount
+                )
+
+                // when
+                val actual: UserPointCommandUseCase.UseUserPointResponse =
+                    pointService.useUserPoint(
+                        id = userId,
+                        amount = amount
+                    )
+
+                // then
+                SoftAssertions.assertSoftly { softAssertions ->
+                    softAssertions.assertThat(actual).isNotNull
+                    softAssertions.assertThat(actual.point).isZero
+                }
+            }
+        }
+
+        @Nested
+        @DisplayName("유저 포인트 사용 실패 테스트")
+        inner class UseUserPointFailTest {
+            @Test
+            @DisplayName("유저가 보유한 포인트보다 많이 사용할 경우 예외가 발생해야 한다.")
+            fun useUserPointTest() {
+                // given
+                val userId = 1L
+                val amount = 1000L
+
+                fakeUserPointPort.singleUserPointFixture(
+                    id = userId,
+                    point = 100L
+                )
+
+                // when & then
+                Assertions
+                    .assertThatThrownBy {
+                        pointService.useUserPoint(
+                            id = userId,
+                            amount = amount
+                        )
+                    }.isInstanceOf(CustomException::class.java)
+                    .hasMessage(
+                        "${ErrorCode.INSUFFICIENT_POINT.message} - requestPoint: $amount, currentPoint: 100"
+                    )
+            }
+        }
+    }
 }
