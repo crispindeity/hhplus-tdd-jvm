@@ -2,9 +2,10 @@ package io.hhplus.tdd.point
 
 import io.hhplus.tdd.exception.CustomException
 import io.hhplus.tdd.exception.ErrorCode
-import io.hhplus.tdd.fake.FakePointHistoryQueryPort
-import io.hhplus.tdd.fake.FakeUserPointQueryPort
+import io.hhplus.tdd.fake.FakePointHistoryPort
+import io.hhplus.tdd.fake.FakeUserPointPort
 import io.hhplus.tdd.point.port.input.PointHistoryQueryUseCase
+import io.hhplus.tdd.point.port.input.UserPointCommandUseCase
 import io.hhplus.tdd.point.port.input.UserPointQueryUseCase
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.SoftAssertions
@@ -15,17 +16,18 @@ import org.junit.jupiter.api.Test
 
 class PointServiceTest {
     private lateinit var pointService: PointService
-    private lateinit var fakeUserPointQueryPort: FakeUserPointQueryPort
-    private lateinit var fakePointHistoryQueryPort: FakePointHistoryQueryPort
+    private lateinit var fakeUserPointPort: FakeUserPointPort
+    private lateinit var fakePointHistoryPort: FakePointHistoryPort
 
     @BeforeEach
     fun setUp() {
-        fakeUserPointQueryPort = FakeUserPointQueryPort()
-        fakePointHistoryQueryPort = FakePointHistoryQueryPort()
+        fakeUserPointPort = FakeUserPointPort()
+        fakePointHistoryPort = FakePointHistoryPort()
         pointService =
             PointService(
-                userPointQueryPort = fakeUserPointQueryPort,
-                pointHistoryQueryPort = fakePointHistoryQueryPort
+                userPointQueryPort = fakeUserPointPort,
+                pointHistoryQueryPort = fakePointHistoryPort,
+                userPointCommandPort = fakeUserPointPort
             )
     }
 
@@ -41,7 +43,7 @@ class PointServiceTest {
                 // given
                 val userId = 1L
 
-                fakeUserPointQueryPort.singleUserPointFixture(userId)
+                fakeUserPointPort.singleUserPointFixture(userId)
 
                 // when
                 val actual: UserPointQueryUseCase.UserPointResponse =
@@ -64,7 +66,7 @@ class PointServiceTest {
                 // given
                 val wrongUserId = 1L
 
-                fakeUserPointQueryPort.singleUserPointFixture(2L)
+                fakeUserPointPort.singleUserPointFixture(2L)
 
                 // when & then
                 Assertions
@@ -88,7 +90,7 @@ class PointServiceTest {
                 // given
                 val userId = 1L
 
-                fakePointHistoryQueryPort.singlePointHistoryFixture(
+                fakePointHistoryPort.singlePointHistoryFixture(
                     id = 1L,
                     userId = userId
                 )
@@ -114,7 +116,7 @@ class PointServiceTest {
                 // given
                 val wrongUserId = 1L
 
-                fakePointHistoryQueryPort.singlePointHistoryFixture(
+                fakePointHistoryPort.singlePointHistoryFixture(
                     id = 1L,
                     userId = 2L
                 )
@@ -125,6 +127,106 @@ class PointServiceTest {
                         pointService.retrievePointHistory(wrongUserId)
                     }.isInstanceOf(CustomException::class.java)
                     .hasMessage("${ErrorCode.NOT_FOUND_POINT_HISTORY.message} - $wrongUserId")
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 포인트 충전 테스트 ")
+    inner class ChargeUserPointTest {
+        @Nested
+        @DisplayName("유저 포인트 충전 성공 테스트")
+        inner class ChargeUserPointSuccessTest {
+            @Test
+            @DisplayName("신규 유저에 대해 포인트를 충전할 수 있어야 한다.")
+            fun chargeUserPointTest() {
+                // give
+                val userId = 1L
+                val amount = 1000L
+
+                // when
+                val actual: UserPointCommandUseCase.ChargeUserPointResponse =
+                    pointService.chargeUserPoint(
+                        id = userId,
+                        amount = amount
+                    )
+
+                // then
+                SoftAssertions.assertSoftly { softAssertions ->
+                    softAssertions.assertThat(actual).isNotNull
+                    softAssertions.assertThat(actual.point).isEqualTo(1000)
+                }
+            }
+
+            @Test
+            @DisplayName("기존 유저에 대해 포인트를 충전 할 수 있어야 한다.")
+            fun chargeUserPointTest2() {
+                // given
+                val userId = 1L
+                val amount = 1000L
+
+                fakeUserPointPort.singleUserPointFixture(
+                    id = userId,
+                    point = 1000L
+                )
+
+                // when
+                val actual: UserPointCommandUseCase.ChargeUserPointResponse =
+                    pointService.chargeUserPoint(
+                        id = userId,
+                        amount = amount
+                    )
+
+                // then
+                SoftAssertions.assertSoftly { softAssertions ->
+                    softAssertions.assertThat(actual).isNotNull
+                    softAssertions.assertThat(actual.point).isEqualTo(2000)
+                }
+            }
+        }
+
+        @Nested
+        @DisplayName("유저 포인트 충전 실패 테스트")
+        inner class ChargeUserPointFailTest {
+            @Test
+            @DisplayName("포인트 충전 시 신규 유저가 보유한 포인트가 limit(1_000_000) 을 초과하면 예외가 발생해야 한다.")
+            fun chargeUserPointTest() {
+                // given
+                val userId = 1L
+                val amount = 1_000_000L
+
+                // when & then
+                Assertions
+                    .assertThatThrownBy {
+                        pointService.chargeUserPoint(
+                            id = userId,
+                            amount = amount
+                        )
+                    }.isInstanceOf(CustomException::class.java)
+                    .hasMessage("${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - $amount")
+            }
+
+            @Test
+            @DisplayName("포인트 충전 시 기존 유저가 보유한 포인트가 limit(1_000_000) 을 초과하면 예외가 발생해야 한다.")
+            fun chargeUserPointTest2() {
+                // given
+                val userId = 1L
+                val amount = 999_999L
+
+                fakeUserPointPort.singleUserPointFixture(
+                    id = userId,
+                    point = 1L
+                )
+
+                // when & then
+                Assertions
+                    .assertThatThrownBy {
+                        pointService.chargeUserPoint(
+                            id = userId,
+                            amount = amount
+                        )
+                    }.isInstanceOf(CustomException::class.java)
+                    .hasMessage("${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - $amount")
             }
         }
     }
