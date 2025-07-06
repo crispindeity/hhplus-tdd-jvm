@@ -54,10 +54,11 @@ class ApiControllerAdvice {
 
     @ExceptionHandler(CustomException::class)
     fun handlerCustomException(exception: CustomException): PointResponse<Unit> =
-        Log.warnLogging(logger) {
+        Log.warnLogging(logger) { log ->
+            log["message"] = exception.codeInterface.message
             PointResponse.fail(
                 code = exception.codeInterface.code,
-                message = exception.codeInterface.message
+                message = exception.message ?: ""
             )
         }
 
