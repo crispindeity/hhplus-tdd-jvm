@@ -1,6 +1,8 @@
 package io.hhplus.tdd
 
+import io.hhplus.tdd.exception.CustomException
 import io.hhplus.tdd.point.response.PointResponse
+import io.hhplus.tdd.util.Log
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -8,11 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
-
-data class ErrorResponse(
-    val code: String,
-    val message: String
-)
 
 @ResponseStatus(HttpStatus.OK)
 @RestControllerAdvice
@@ -55,7 +52,19 @@ class ApiControllerAdvice {
         )
     }
 
+    @ExceptionHandler(CustomException::class)
+    fun handlerCustomException(exception: CustomException): PointResponse<Unit> =
+        Log.warnLogging(logger) {
+            PointResponse.fail(
+                code = exception.codeInterface.code,
+                message = exception.codeInterface.message
+            )
+        }
+
     @ExceptionHandler(Exception::class)
     fun handleException(exception: Exception): PointResponse<Unit> =
-        PointResponse.fail(500, "internet server error")
+        Log.errorLogging(logger, exception) { log ->
+            log["exception message"] = exception.message.toString()
+            PointResponse.fail(500, "internet server error")
+        }
 }

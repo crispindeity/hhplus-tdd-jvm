@@ -2,9 +2,12 @@ package io.hhplus.tdd.fake
 
 import io.hhplus.tdd.point.PointHistory
 import io.hhplus.tdd.point.TransactionType
+import io.hhplus.tdd.point.port.output.PointHistoryCommandPort
 import io.hhplus.tdd.point.port.output.PointHistoryQueryPort
 
-class FakePointHistoryPort : PointHistoryQueryPort {
+class FakePointHistoryPort :
+    PointHistoryQueryPort,
+    PointHistoryCommandPort {
     private val storage: MutableMap<Long, PointHistory> = mutableMapOf()
 
     fun singlePointHistoryFixture(
@@ -28,4 +31,9 @@ class FakePointHistoryPort : PointHistoryQueryPort {
         storage.values.filter { it.userId == userId }
 
     override fun exists(userId: Long): Boolean = storage.values.any { it.userId == userId }
+
+    override fun save(pointHistory: PointHistory): PointHistory {
+        storage[pointHistory.id] = pointHistory
+        return pointHistory
+    }
 }

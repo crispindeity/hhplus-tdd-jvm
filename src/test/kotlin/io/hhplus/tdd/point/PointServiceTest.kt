@@ -27,7 +27,8 @@ class PointServiceTest {
             PointService(
                 userPointQueryPort = fakeUserPointPort,
                 pointHistoryQueryPort = fakePointHistoryPort,
-                userPointCommandPort = fakeUserPointPort
+                userPointCommandPort = fakeUserPointPort,
+                pointHistoryCommandPort = fakePointHistoryPort
             )
     }
 
@@ -155,6 +156,11 @@ class PointServiceTest {
                 SoftAssertions.assertSoftly { softAssertions ->
                     softAssertions.assertThat(actual).isNotNull
                     softAssertions.assertThat(actual.point).isEqualTo(1000)
+                    softAssertions
+                        .assertThat(fakePointHistoryPort.findBy(userId).first().type)
+                        .isEqualTo(
+                            TransactionType.CHARGE
+                        )
                 }
             }
 
@@ -260,6 +266,11 @@ class PointServiceTest {
                 SoftAssertions.assertSoftly { softAssertions ->
                     softAssertions.assertThat(actual).isNotNull
                     softAssertions.assertThat(actual.point).isZero
+                    softAssertions
+                        .assertThat(fakePointHistoryPort.findBy(userId).first().type)
+                        .isEqualTo(
+                            TransactionType.USE
+                        )
                 }
             }
         }
