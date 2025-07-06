@@ -27,8 +27,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.validation)
+    implementation(libs.jackson.kotlin)
     annotationProcessor(libs.spring.boot.configuration.processor)
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.rest.assured)
+    testImplementation(libs.rest.assured.kotlin.extensions)
+    testImplementation(libs.spring.mockk)
+    testImplementation(libs.kotest.runner.junit5)
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 

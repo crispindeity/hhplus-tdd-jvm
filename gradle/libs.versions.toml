@@ -6,6 +6,7 @@ spring_boot = "3.2.0"
 spring_cloud_dependencies = "2023.0.0"
 spring_io_dependency_management = "1.1.0"
 spring_mockk = "4.0.2"
+rest_assured = "5.4.0"
 
 redisson = "3.25.2"
 # test
@@ -13,6 +14,7 @@ junit = "5.9.3"
 assertj = "3.24.2"
 test_containers = "1.19.3"
 fixture_monkey = "1.0.13"
+kotest = "5.9.1"
 
 [plugins]
 kotlin_jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -51,5 +53,8 @@ micrometer_registry_prometheus = { module = "io.micrometer:micrometer-registry-p
 # test
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 spring_mockk = { module = "com.ninja-squad:springmockk", version.ref = "spring_mockk" }
+rest_assured = { module = "io.rest-assured:rest-assured", version.ref = "rest_assured"}
+rest_assured_kotlin_extensions = { module = "io.rest-assured:kotlin-extensions", version.ref = "rest_assured"}
+kotest_runner_junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 [bundles]
 testcontainers_mysql = ["test_containers_mysql", "spring_boot_testcontainers", "test_containers_junit_jupiter", "spring_boot_starter_test"]
