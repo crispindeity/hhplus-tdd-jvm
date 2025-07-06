@@ -1,7 +1,7 @@
 package io.hhplus.tdd.exception
 
 class CustomException(
-    codeInterface: CodeInterface,
+    val codeInterface: CodeInterface,
     additionalMessage: String? = null
 ) : RuntimeException(
         additionalMessage?.let { "${codeInterface.message} - $it" }

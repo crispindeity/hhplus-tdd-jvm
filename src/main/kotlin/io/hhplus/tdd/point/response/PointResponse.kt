@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 class PointResponse<T> private constructor(
     private val code: Int,
     private val message: String,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private val result: T? = null
 ) {
     companion object {
@@ -26,5 +25,6 @@ class PointResponse<T> private constructor(
 
     fun getMessage(): String = message
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     fun getResult(): T? = result
 }

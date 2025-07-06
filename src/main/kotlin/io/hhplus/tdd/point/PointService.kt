@@ -6,6 +6,7 @@ import io.hhplus.tdd.point.extensions.toDto
 import io.hhplus.tdd.point.port.input.PointHistoryQueryUseCase
 import io.hhplus.tdd.point.port.input.UserPointCommandUseCase
 import io.hhplus.tdd.point.port.input.UserPointQueryUseCase
+import io.hhplus.tdd.point.port.output.PointHistoryCommandPort
 import io.hhplus.tdd.point.port.output.PointHistoryQueryPort
 import io.hhplus.tdd.point.port.output.UserPointCommandPort
 import io.hhplus.tdd.point.port.output.UserPointQueryPort
@@ -17,7 +18,8 @@ import org.springframework.stereotype.Service
 class PointService(
     private val userPointQueryPort: UserPointQueryPort,
     private val pointHistoryQueryPort: PointHistoryQueryPort,
-    private val userPointCommandPort: UserPointCommandPort
+    private val userPointCommandPort: UserPointCommandPort,
+    private val pointHistoryCommandPort: PointHistoryCommandPort
 ) : UserPointQueryUseCase,
     PointHistoryQueryUseCase,
     UserPointCommandUseCase {
@@ -83,6 +85,15 @@ class PointService(
                     amount = userPoint.point
                 )
 
+            pointHistoryCommandPort.save(
+                PointHistory(
+                    userId = id,
+                    type = TransactionType.CHARGE,
+                    amount = amount,
+                    timeMillis = System.currentTimeMillis()
+                )
+            )
+
             UserPointCommandUseCase.ChargeUserPointResponse(
                 id = chargedUserPoint.id,
                 point = chargedUserPoint.point,
@@ -109,6 +120,15 @@ class PointService(
                 id = usedUserPoint.id,
                 amount = usedUserPoint.point
             )
+
+        pointHistoryCommandPort.save(
+            PointHistory(
+                userId = id,
+                type = TransactionType.USE,
+                amount = amount,
+                timeMillis = System.currentTimeMillis()
+            )
+        )
 
         return@logging UserPointCommandUseCase.UseUserPointResponse(
             id = updatedUserPoint.id,
