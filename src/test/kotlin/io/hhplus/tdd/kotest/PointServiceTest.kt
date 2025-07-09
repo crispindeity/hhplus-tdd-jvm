@@ -179,7 +179,32 @@ class PointServiceTest : DescribeSpec() {
                             )
                         }
 
-                    actual.message shouldBe "user point exceeds allowed maximum - 1000001"
+                    actual.message shouldBe
+                        "user point exceeds allowed maximum - requestPoint: 1000, currentPoint: 999001"
+
+                    verify(exactly = 1) { userPointQueryPort.findBy(userId) }
+                }
+
+                it("포인트 충전 시 한번에 충전할 수 있는 포인트(100_000)를 초과하는 경우 예외가 발생해야 한다.") {
+                    val amount = 100_001L
+                    val foundUserPoint =
+                        UserPoint(
+                            id = userId,
+                            point = 1L,
+                            updateMillis = now
+                        )
+
+                    every { userPointQueryPort.findBy(userId) } returns foundUserPoint
+
+                    val actual: CustomException =
+                        shouldThrow<CustomException> {
+                            pointService.chargeUserPoint(
+                                userId,
+                                amount
+                            )
+                        }
+
+                    actual.message shouldBe "user point exceeds allowed maximum - requestPoint: 100001, currentPoint: 1"
 
                     verify(exactly = 1) { userPointQueryPort.findBy(userId) }
                 }

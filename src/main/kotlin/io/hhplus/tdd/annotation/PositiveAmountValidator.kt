@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext
 
 class PositiveAmountValidator : ConstraintValidator<PositiveAmount, Long> {
     companion object {
-        private const val USER_POINT_LIMIT = 1_000_000
+        private const val USER_POINT_LIMIT = 100_000
     }
 
     override fun isValid(
