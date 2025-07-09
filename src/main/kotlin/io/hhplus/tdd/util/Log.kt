@@ -8,9 +8,13 @@ import org.slf4j.LoggerFactory
 
 object Log {
     private val objectMapper = jacksonObjectMapper()
+
     fun <T : Any> getLogger(clazz: Class<T>): Logger = LoggerFactory.getLogger(clazz)
 
-    fun <T> logging(log: Logger, function: (MutableMap<String, Any>) -> T?): T {
+    fun <T> logging(
+        log: Logger,
+        function: (MutableMap<String, Any>) -> T?
+    ): T {
         val logInfo: MutableMap<String, Any> = mutableMapOf()
         val startedAt: Long = now()
         logInfo["startedAt"] = startedAt
@@ -35,7 +39,10 @@ object Log {
         )
     }
 
-    fun <T> warnLogging(log: Logger, function: (MutableMap<String, Any>) -> T?): T {
+    fun <T> warnLogging(
+        log: Logger,
+        function: (MutableMap<String, Any>) -> T?
+    ): T {
         val logWarn: MutableMap<String, Any> = mutableMapOf()
         val result: T? = function(logWarn)
         log.warn(toJson(logWarn))
@@ -60,9 +67,10 @@ object Log {
 
     private fun now(): Long = System.currentTimeMillis()
 
-    private fun toJson(map: Map<String, Any>): String = try {
-        objectMapper.writeValueAsString(map)
-    } catch (_: Exception) {
-        map.toString()
-    }
+    private fun toJson(map: Map<String, Any>): String =
+        try {
+            objectMapper.writeValueAsString(map)
+        } catch (_: Exception) {
+            map.toString()
+        }
 }
