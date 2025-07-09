@@ -9,6 +9,7 @@ class FakePointHistoryPort :
     PointHistoryQueryPort,
     PointHistoryCommandPort {
     private val storage: MutableMap<Long, PointHistory> = mutableMapOf()
+    private var sequence: Long = 1L
 
     fun singlePointHistoryFixture(
         id: Long,
@@ -33,7 +34,15 @@ class FakePointHistoryPort :
     override fun exists(userId: Long): Boolean = storage.values.any { it.userId == userId }
 
     override fun save(pointHistory: PointHistory): PointHistory {
-        storage[pointHistory.id] = pointHistory
-        return pointHistory
+        val id: Long = pointHistory.id
+        return if (storage.containsKey(id)) {
+            storage[id] = pointHistory
+            pointHistory
+        } else {
+            val newId: Long = sequence++
+            val newPointHistory: PointHistory = pointHistory.copy(id = newId)
+            storage[newId] = newPointHistory
+            newPointHistory
+        }
     }
 }
