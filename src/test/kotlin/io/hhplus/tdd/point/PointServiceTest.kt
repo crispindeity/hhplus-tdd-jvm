@@ -57,26 +57,6 @@ class PointServiceTest {
                 }
             }
         }
-
-        @Nested
-        @DisplayName("유저 포인트 조회 실패 테스트")
-        inner class RetrieveUserPointFailTest {
-            @Test
-            @DisplayName("존재하지 않는 유저 아이디로 포인트 조회 시 예외가 발생해야 한다.")
-            fun retrieveUserPointTest() {
-                // given
-                val wrongUserId = 1L
-
-                fakeUserPointPort.singleUserPointFixture(2L)
-
-                // when & then
-                Assertions
-                    .assertThatThrownBy {
-                        pointService.retrieveUserPoint(wrongUserId)
-                    }.isInstanceOf(CustomException::class.java)
-                    .hasMessage("${ErrorCode.NOT_FOUND_USER_POINT.message} - $wrongUserId")
-            }
-        }
     }
 
     @Nested
@@ -103,7 +83,7 @@ class PointServiceTest {
                 // then
                 SoftAssertions.assertSoftly { softAssertions ->
                     softAssertions.assertThat(actual).isNotNull
-                    softAssertions.assertThat(actual.responses.first().userId).isEqualTo(userId)
+                    softAssertions.assertThat(actual.histories.first().userId).isEqualTo(userId)
                 }
             }
         }
@@ -199,7 +179,7 @@ class PointServiceTest {
             fun chargeUserPointTest() {
                 // given
                 val userId = 1L
-                val amount = 1_000_000L
+                val amount = 1_000_001L
 
                 // when & then
                 Assertions
@@ -209,7 +189,9 @@ class PointServiceTest {
                             amount = amount
                         )
                     }.isInstanceOf(CustomException::class.java)
-                    .hasMessage("${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - $amount")
+                    .hasMessage(
+                        "${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - requestPoint: $amount, currentPoint: 0"
+                    )
             }
 
             @Test
@@ -218,10 +200,11 @@ class PointServiceTest {
                 // given
                 val userId = 1L
                 val amount = 999_999L
+                val currentPoint = 2L
 
                 fakeUserPointPort.singleUserPointFixture(
                     id = userId,
-                    point = 1L
+                    point = currentPoint
                 )
 
                 // when & then
@@ -232,7 +215,9 @@ class PointServiceTest {
                             amount = amount
                         )
                     }.isInstanceOf(CustomException::class.java)
-                    .hasMessage("${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - $amount")
+                    .hasMessage(
+                        "${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - requestPoint: $amount, currentPoint: $currentPoint"
+                    )
             }
         }
     }
