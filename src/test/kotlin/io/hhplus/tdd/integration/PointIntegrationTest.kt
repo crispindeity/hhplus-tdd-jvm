@@ -242,8 +242,8 @@ class PointIntegrationTest : AbstractIntegrationTest() {
                 val amount = 2L
                 val currentPoint = 999_999L
 
-                UserPointSteps.chargeUserPoint(
-                    userId = userId,
+                userPointTable.insertOrUpdate(
+                    id = userId,
                     amount = currentPoint
                 )
 
@@ -270,7 +270,9 @@ class PointIntegrationTest : AbstractIntegrationTest() {
                         .isEqualTo(400)
                     softAssertions
                         .assertThat(response.jsonPath().getString("message"))
-                        .isEqualTo("user point exceeds allowed maximum - ${amount + currentPoint}")
+                        .isEqualTo(
+                            "user point exceeds allowed maximum - requestPoint: $amount, currentPoint: $currentPoint"
+                        )
                 }
             }
         }

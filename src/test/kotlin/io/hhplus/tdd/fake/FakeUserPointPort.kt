@@ -23,7 +23,8 @@ class FakeUserPointPort :
         storage[userPoint.id] = userPoint
     }
 
-    override fun findBy(id: Long): UserPoint? = storage[id]
+    override fun findBy(id: Long): UserPoint =
+        storage[id] ?: UserPoint(id = id, point = 0, updateMillis = System.currentTimeMillis())
 
     override fun chargeUserPoint(
         id: Long,

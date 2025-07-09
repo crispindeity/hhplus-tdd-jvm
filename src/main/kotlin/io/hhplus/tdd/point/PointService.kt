@@ -58,7 +58,7 @@ class PointService(
             val pointHistories: List<PointHistory> = pointHistoryQueryPort.findBy(userId)
 
             return@logging PointHistoryQueryUseCase.PointHistoryResponses(
-                responses = pointHistories.map { it.toDto() },
+                histories = pointHistories.map { it.toDto() },
                 count = pointHistories.size
             )
         }
@@ -69,21 +69,14 @@ class PointService(
     ): UserPointCommandUseCase.ChargeUserPointResponse =
         Log.logging(logger) { log ->
             log["method"] = "chargeUserPoint()"
-            val userPoint: UserPoint =
-                userPointQueryPort
-                    .findBy(id)
-                    ?.pointCharge(amount)
-                    ?: UserPoint(
-                        id = id,
-                        point = amount,
-                        updateMillis = System.currentTimeMillis()
-                    )
+            val foundUserPoint: UserPoint = userPointQueryPort.findBy(id)
 
-            val chargedUserPoint: UserPoint =
-                userPointCommandPort.chargeUserPoint(
-                    id = userPoint.id,
-                    amount = userPoint.point
-                )
+            val chargedUserPoint: UserPoint = foundUserPoint.pointCharge(amount)
+
+            userPointCommandPort.chargeUserPoint(
+                id = chargedUserPoint.id,
+                amount = chargedUserPoint.point
+            )
 
             pointHistoryCommandPort.save(
                 PointHistory(
@@ -107,11 +100,7 @@ class PointService(
     ) = Log.logging(logger) { log ->
         log["method"] = "useUserPoint()"
 
-        val foundUserPoint: UserPoint =
-            userPointQueryPort.findBy(id) ?: throw CustomException(
-                codeInterface = ErrorCode.NOT_FOUND_USER_POINT,
-                additionalMessage = id.toString()
-            )
+        val foundUserPoint: UserPoint = userPointQueryPort.findBy(id)
 
         val usedUserPoint: UserPoint = foundUserPoint.pointUse(amount)
 

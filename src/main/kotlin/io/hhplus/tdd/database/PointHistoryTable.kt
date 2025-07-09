@@ -32,4 +32,8 @@ class PointHistoryTable {
     }
 
     fun selectAllByUserId(userId: Long): List<PointHistory> = table.filter { it.userId == userId }
+
+    fun clear() {
+        table.clear()
+    }
 }

@@ -11,7 +11,7 @@ class UserPointPersistenceAdapter(
     private val userPointTable: UserPointTable
 ) : UserPointQueryPort,
     UserPointCommandPort {
-    override fun findBy(id: Long): UserPoint? = userPointTable.selectById(id)
+    override fun findBy(id: Long): UserPoint = userPointTable.selectById(id)
 
     override fun chargeUserPoint(
         id: Long,

@@ -7,7 +7,7 @@ class FakePointHistoryQueryUseCase : PointHistoryQueryUseCase {
         userId: Long
     ): PointHistoryQueryUseCase.PointHistoryResponses =
         PointHistoryQueryUseCase.PointHistoryResponses(
-            responses =
+            histories =
                 listOf(
                     PointHistoryQueryUseCase.PointHistoryResponse(
                         id = 1L,

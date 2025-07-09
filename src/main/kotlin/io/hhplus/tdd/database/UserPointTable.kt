@@ -25,4 +25,8 @@ class UserPointTable {
         table[id] = userPoint
         return userPoint
     }
+
+    fun clear() {
+        table.clear()
+    }
 }

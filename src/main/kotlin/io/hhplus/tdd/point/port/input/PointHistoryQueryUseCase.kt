@@ -2,7 +2,7 @@ package io.hhplus.tdd.point.port.input
 
 interface PointHistoryQueryUseCase {
     data class PointHistoryResponses(
-        val responses: List<PointHistoryResponse>,
+        val histories: List<PointHistoryResponse>,
         val count: Int
     )
 
