@@ -1,5 +1,10 @@
 package io.hhplus.tdd.point
 
+import io.hhplus.tdd.annotation.PositiveAmount
+import io.hhplus.tdd.point.port.input.PointHistoryQueryUseCase
+import io.hhplus.tdd.point.port.input.UserPointCommandUseCase
+import io.hhplus.tdd.point.port.input.UserPointQueryUseCase
+import io.hhplus.tdd.point.response.PointResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,40 +16,56 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/point")
-class PointController {
-    private val logger: Logger = LoggerFactory.getLogger(javaClass)
-
-    /**
-     * TODO - 특정 유저의 포인트를 조회하는 기능을 작성해주세요.
-     */
+class PointController(
+    private val userPointQueryUseCase: UserPointQueryUseCase,
+    private val pointHistoryQueryUseCase: PointHistoryQueryUseCase,
+    private val userPointCommandUseCase: UserPointCommandUseCase
+) {
     @GetMapping("{id}")
     fun point(
         @PathVariable id: Long
-    ): UserPoint = UserPoint(0, 0, 0)
+    ): PointResponse<UserPointQueryUseCase.UserPointResponse> {
+        val response: UserPointQueryUseCase.UserPointResponse =
+            userPointQueryUseCase.retrieveUserPoint(id)
 
-    /**
-     * TODO - 특정 유저의 포인트 충전/이용 내역을 조회하는 기능을 작성해주세요.
-     */
+        return PointResponse.success(result = response)
+    }
+
     @GetMapping("{id}/histories")
     fun history(
         @PathVariable id: Long
-    ): List<PointHistory> = emptyList()
+    ): PointResponse<PointHistoryQueryUseCase.PointHistoryResponses> {
+        val response: PointHistoryQueryUseCase.PointHistoryResponses =
+            pointHistoryQueryUseCase.retrievePointHistory(id)
 
-    /**
-     * TODO - 특정 유저의 포인트를 충전하는 기능을 작성해주세요.
-     */
+        return PointResponse.success(result = response)
+    }
+
     @PatchMapping("{id}/charge")
     fun charge(
         @PathVariable id: Long,
-        @RequestBody amount: Long
-    ): UserPoint = UserPoint(0, 0, 0)
+        @RequestBody @PositiveAmount amount: Long
+    ): PointResponse<UserPointCommandUseCase.ChargeUserPointResponse> {
+        val response: UserPointCommandUseCase.ChargeUserPointResponse =
+            userPointCommandUseCase.chargeUserPoint(
+                id = id,
+                amount = amount
+            )
 
-    /**
-     * TODO - 특정 유저의 포인트를 사용하는 기능을 작성해주세요.
-     */
+        return PointResponse.success(result = response)
+    }
+
     @PatchMapping("{id}/use")
     fun use(
         @PathVariable id: Long,
-        @RequestBody amount: Long
-    ): UserPoint = UserPoint(0, 0, 0)
+        @RequestBody @PositiveAmount amount: Long
+    ): PointResponse<UserPointCommandUseCase.UseUserPointResponse> {
+        val response: UserPointCommandUseCase.UseUserPointResponse =
+            userPointCommandUseCase.useUserPoint(
+                id = id,
+                amount = amount
+            )
+
+        return PointResponse.success(result = response)
+    }
 }
