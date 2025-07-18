@@ -14,7 +14,7 @@ data class UserPoint(
     }
 
     fun pointCharge(amount: Long): UserPoint {
-        verifyMaxPointLimit(amount)
+        verifyPointsCharge(amount)
         return this.copy(
             point = point + amount,
             updateMillis = System.currentTimeMillis()
@@ -22,29 +22,32 @@ data class UserPoint(
     }
 
     fun pointUse(amount: Long): UserPoint {
-        verifySufficientPoint(amount)
+        verifyPointUse(amount)
         return this.copy(
             point = point - amount,
             updateMillis = System.currentTimeMillis()
         )
     }
 
-    private fun verifyMaxPointLimit(amount: Long) {
-        if (amount <= SINGLE_CHARGE_LIMIT && this.point + amount <= USER_POINT_LIMIT) {
+    private fun verifyPointsCharge(amount: Long) {
+        if (amount > 0 &&
+            amount <= SINGLE_CHARGE_LIMIT &&
+            this.point + amount <= USER_POINT_LIMIT
+        ) {
             return
         }
         throw CustomException(
-            codeInterface = ErrorCode.EXCEEDS_MAX_POINT_LIMIT,
+            codeInterface = ErrorCode.POINTS_CHARGE_VERIFY_FAIL,
             additionalMessage = "requestPoint: $amount, currentPoint: ${this.point}"
         )
     }
 
-    private fun verifySufficientPoint(amount: Long) {
-        if (this.point - amount >= 0) {
+    private fun verifyPointUse(amount: Long) {
+        if (amount >= 0 && this.point - amount >= 0) {
             return
         }
         throw CustomException(
-            codeInterface = ErrorCode.INSUFFICIENT_POINT,
+            codeInterface = ErrorCode.POINTS_USE_VERIFY_FAIL,
             additionalMessage = "requestPoint: $amount, currentPoint: ${this.point}"
         )
     }
