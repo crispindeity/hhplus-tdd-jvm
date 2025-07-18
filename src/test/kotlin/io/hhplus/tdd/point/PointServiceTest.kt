@@ -190,7 +190,7 @@ class PointServiceTest {
                         )
                     }.isInstanceOf(CustomException::class.java)
                     .hasMessage(
-                        "${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - requestPoint: $amount, currentPoint: 0"
+                        "${ErrorCode.POINTS_CHARGE_VERIFY_FAIL.message} - requestPoint: $amount, currentPoint: 0"
                     )
             }
 
@@ -216,7 +216,7 @@ class PointServiceTest {
                         )
                     }.isInstanceOf(CustomException::class.java)
                     .hasMessage(
-                        "${ErrorCode.EXCEEDS_MAX_POINT_LIMIT.message} - requestPoint: $amount, currentPoint: $currentPoint"
+                        "${ErrorCode.POINTS_CHARGE_VERIFY_FAIL.message} - requestPoint: $amount, currentPoint: $currentPoint"
                     )
             }
         }
@@ -284,7 +284,7 @@ class PointServiceTest {
                         )
                     }.isInstanceOf(CustomException::class.java)
                     .hasMessage(
-                        "${ErrorCode.INSUFFICIENT_POINT.message} - requestPoint: $amount, currentPoint: 100"
+                        "${ErrorCode.POINTS_USE_VERIFY_FAIL.message} - requestPoint: $amount, currentPoint: 100"
                     )
             }
         }
