@@ -271,7 +271,7 @@ class PointIntegrationTest : AbstractIntegrationTest() {
                     softAssertions
                         .assertThat(response.jsonPath().getString("message"))
                         .isEqualTo(
-                            "user point exceeds allowed maximum - requestPoint: $amount, currentPoint: $currentPoint"
+                            "user points charge fail - requestPoint: $amount, currentPoint: $currentPoint"
                         )
                 }
             }
@@ -384,7 +384,7 @@ class PointIntegrationTest : AbstractIntegrationTest() {
                     softAssertions
                         .assertThat(response.jsonPath().getString("message"))
                         .isEqualTo(
-                            "not enough point to complete the operation - requestPoint: $amount, currentPoint: $currentPoint"
+                            "user points use fail - requestPoint: $amount, currentPoint: $currentPoint"
                         )
                 }
             }

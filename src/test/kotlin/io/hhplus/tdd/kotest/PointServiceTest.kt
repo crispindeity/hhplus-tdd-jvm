@@ -180,7 +180,7 @@ class PointServiceTest : DescribeSpec() {
                         }
 
                     actual.message shouldBe
-                        "user point exceeds allowed maximum - requestPoint: 1000, currentPoint: 999001"
+                        "user points charge fail - requestPoint: 1000, currentPoint: 999001"
 
                     verify(exactly = 1) { userPointQueryPort.findBy(userId) }
                 }
@@ -204,7 +204,8 @@ class PointServiceTest : DescribeSpec() {
                             )
                         }
 
-                    actual.message shouldBe "user point exceeds allowed maximum - requestPoint: 100001, currentPoint: 1"
+                    actual.message shouldBe
+                        "user points charge fail - requestPoint: 100001, currentPoint: 1"
 
                     verify(exactly = 1) { userPointQueryPort.findBy(userId) }
                 }
@@ -298,7 +299,7 @@ class PointServiceTest : DescribeSpec() {
                         }
 
                     actual.message shouldBe
-                        "not enough point to complete the operation - requestPoint: 1000, currentPoint: 999"
+                        "user points use fail - requestPoint: 1000, currentPoint: 999"
 
                     verify(exactly = 1) { userPointQueryPort.findBy(userId) }
                 }
